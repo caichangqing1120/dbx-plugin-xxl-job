@@ -15,12 +15,14 @@ import (
 )
 
 const pluginID = "io.github.caichangqing1120.xxljob"
-const version = "0.1.1"
+const version = "0.2.0"
 
 type plugin struct {
-	lifecycle sync.Mutex
-	mu        sync.RWMutex
-	sessions  map[string]*session
+	mcpMu       sync.Mutex
+	mcpSessions map[string]*mcpCacheEntry
+	lifecycle   sync.Mutex
+	mu          sync.RWMutex
+	sessions    map[string]*session
 }
 
 func newPlugin() *plugin { return &plugin{sessions: map[string]*session{}} }
@@ -34,9 +36,21 @@ type params struct {
 }
 
 func (p *plugin) Handle(_ sdk.RequestContext, method string, raw json.RawMessage, _ *sdk.Emitter) (any, *sdk.PluginError) {
+	if method == "mcp/tools" || method == "mcp/call" {
+		return p.handleMCP(method, raw)
+	}
 	var v params
 	if json.Unmarshal(raw, &v) != nil {
 		return nil, sdk.NewError(-32602, "无效请求参数")
+	}
+	// A host reconnect/disconnect releases only this identity's MCP cache, never unrelated workbench state.
+	if (method == "connection/connect" || method == "connection/disconnect") && v.Connection.ID != "" {
+		p.mcpMu.Lock()
+		if entry := p.mcpSessions[v.Connection.ID]; entry != nil {
+			entry.session.close()
+			delete(p.mcpSessions, v.Connection.ID)
+		}
+		p.mcpMu.Unlock()
 	}
 	result, e := p.handle(method, v)
 	if e != nil {

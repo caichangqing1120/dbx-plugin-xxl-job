@@ -2,10 +2,15 @@
   "name": "XXL-JOB",
   "description": "Manage official XXL-JOB Admin 2.3.x and 3.4.x jobs, executors and logs in DBX.",
   "icon": "assets/plugin.svg",
-  "tags": ["xxl-job", "scheduler", "jobs"],
+  "tags": [
+    "xxl-job",
+    "scheduler",
+    "jobs"
+  ],
   "permissions": [],
   "source": "https://github.com/caichangqing1120/dbx-plugin-xxl-job",
   "homepage": "https://github.com/caichangqing1120/dbx-plugin-xxl-job",
   "license": "MIT",
-  "releaseNotes": "Align the default 3.4.x connection path with the official root deployment; clarify the 2.3.x path and retain custom paths."
+  "releaseNotes": "Expose 13 lifecycle-bound MCP tools with explicit access declarations, existing confirmation/read-only guards, portable schemas and isolated sessions. Version 0.2.0 requires matching updated DBX and standalone MCP support.",
+  "mcpTools": true
 }

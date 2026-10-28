@@ -4,6 +4,8 @@ DBX workbench for official XXL-JOB Admin. Provides separate `2.3.x` and `3.4.x` 
 
 This is a separate public plugin (`io.github.caichangqing1120.xxljob`), not the internal plugin. It does not require direct database access or modify the XXL-JOB server.
 
+Current plugin version: `0.2.0`.
+
 ## Connect
 
 Requires DBX `0.6.14` or newer, Host API `1`. Enter the Admin IP/domain, port, username and password. New connections select `3.4.x` and `/` by default, matching the official 3.4.2 configuration. For stock `2.3.x`, select that version and change the application path to `/xxl-job-admin`. If the Admin is deployed at a custom path, enter that path instead. HTTPS and DBX SSH/proxy/HTTP tunnels are supported. HTTP transmits the login password in clear text: use it only on a trusted private network.
@@ -27,12 +29,11 @@ npm test
 npm run build
 go -C backend test -race ./...
 go -C backend vet ./...
-npm install --global @dbx-app/plugin-cli@0.1.9
-npm run package:all
-go run scripts/verify-package.go dist/io.github.caichangqing1120.xxljob-0.1.1-darwin-arm64.dbxp --handshake
+npm exec --yes --package=@dbx-app/plugin-cli@0.1.9 -- npm run package:all
+go run scripts/verify-package.go dist/io.github.caichangqing1120.xxljob-0.2.0-darwin-arm64.dbxp --handshake
 ```
 
-`package:all` builds independent native sidecars for macOS, Windows and Linux, both ARM64 and x64. It emits six unsigned `.dbxp` candidates, their `.artifact.json` metadata, `SHA256SUMS-v0.1.1.txt` and `release-candidates.json`. Cross-platform packages are architecture and checksum checked, not claimed as tested in a DBX desktop on every OS. These unsigned packages are review candidates: normal marketplace installation requires DBX Store review and signing.
+`package:all` builds independent native sidecars for macOS, Windows and Linux, both ARM64 and x64. It emits six unsigned `.dbxp` candidates, their `.artifact.json` metadata, `SHA256SUMS-v0.2.0.txt` and `release-candidates.json`. Cross-platform packages are architecture and checksum checked, not claimed as tested in a DBX desktop on every OS. These unsigned packages are review candidates: normal marketplace installation requires DBX Store review and signing.
 
 Local fixture testing uses synthetic data only (`node scripts/fixture-server.mjs`); no real Admin instance or production task was used. Do not enter a real password into the development host because `.dbx-dev` stores its fixture credentials in plaintext.
 
@@ -41,3 +42,29 @@ Local fixture testing uses synthetic data only (`node scripts/fixture-server.mjs
 Source and unsigned candidates are published to the author's GitHub Release. A separate candidate PR to [`t8y2/dbx-store`](https://github.com/t8y2/dbx-store) is required; DBX maintainers review and sign the exact candidate bytes before the plugin can appear in the official catalog. Creating a public repository or Release does not itself list or sign the plugin. No signing private key belongs in this repository.
 
 The third-party notices in `assets/` and the vendored DBX Go SDK license in `backend/sdk/` must accompany every package. The plugin's own source is MIT-licensed; see `LICENSE`.
+
+## MCP Tools (0.2.0)
+
+The plugin declares 13 exact tools for both the built-in AI surface and external `dbx` MCP server. It requires matching DBX Desktop and standalone MCP builds containing the plugin tool-access protocol verified against upstream `8c2bbe35b`; the existing engine floor is not a claim that every older build understands the new contribution.
+
+- `read` (6): connection metadata, authorized executors, jobs, scheduling logs, execution log content, jobs-by-authorized-executor options.
+- `write` (2): start and stop scheduling for an existing job.
+- `full` (5): execute an existing job, create/edit job configuration, delete a job, create/edit executors, delete executors. Execution and administrator capabilities are deliberately not labelled ordinary writes.
+
+Enable the installed plugin in Plugin Center for AI tools. For external tools, use **Settings -> MCP -> Capabilities** to authorize this plugin, choose an access ceiling, and opt into individual tools; use **Permissions** to restrict connections and configure high-risk call confirmation. Installation or upgrade never grants access or changes the user's grants. New/elevated non-read tools remain subject to the host's update-acceptance policy. Built-in AI additionally requires an open matching connection; external calls may use saved connections without an open workbench.
+
+Every call uses only `lifecycle.connection.id`, host-resolved credentials and the host runtime endpoint. Optional `connectionId` must match. Tool arguments are flat, explicitly typed existing service fields, plus an explicit boolean `confirmed` for every mutation; a host approval never silently sets this flag. Unknown fields, methods, model credentials, connection-policy overrides and arbitrary RPC/URLs are rejected before authentication. Connection read-only and existing service authorization/confirmation/validation remain enforced on every call, even with cached sessions.
+
+Discovery performs no login or network access. Execution uses an isolated, serialized, bounded 32-connection MCP cache (not the UI session map), fingerprinted by identity/configuration/credentials/read-only/runtime; host reconnect/disconnect releases only that identity. Passwords are cleared after login and are not retained in the cache. XXL execution-log requests retain and verify prior log-list provenance. Expired sessions and ambiguous writes are not automatically retried; verify service state before any deliberate retry.
+
+Results are untrusted data, never instructions. They preserve existing 4 MiB transport limits and use a 1 MiB MCP request/result ceiling, key-based secret redaction, host-password/session-cookie replacement, and common labelled credential/Bearer redaction. These cannot recognize every arbitrary secret embedded in unlabeled application log text: avoid requesting sensitive logs. Oversized results return an error and never imply a mutation was rolled back.
+
+Exact tool names, handlers, access groups and local verification evidence are in `docs/specs/001-mcp-tools/plan.md` and `docs/specs/001-mcp-tools/validation.md`. No live credentials or production service writes are used for this upgrade.
+
+## Version 0.2.0 Release
+
+[Author release](https://github.com/caichangqing1120/dbx-plugin-xxl-job/releases/tag/v0.2.0) | [Release notes](docs/releases/v0.2.0.md). Exact packages and checksums are immutable under `v0.2.0`; official signing and production acceptance are separate.
+
+Candidate CI is explicitly dispatched with an existing immutable `tag`. Publishing locally verified assets no longer automatically rebuilds and attempts to re-upload the same immutable asset names.
+
+Fresh isolated `dbx-mcp 0.4.134` host discovery, access ceilings, readonly execution/denial and revocation validation: [`release-validation.md`](docs/specs/001-mcp-tools/release-validation.md). This is not Desktop installer/signature or production-service acceptance.

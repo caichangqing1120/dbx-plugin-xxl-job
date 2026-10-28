@@ -75,6 +75,7 @@ if (requestedTarget === 'all') {
     icon: `https://raw.githubusercontent.com${new URL(listing.source).pathname}/${tag}/${listing.icon}`,
     tags: listing.tags,
     permissions: listing.permissions,
+    mcpTools: listing.mcpTools,
     source,
     homepage: listing.homepage,
     license: listing.license,

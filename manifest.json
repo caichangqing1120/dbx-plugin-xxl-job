@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "id": "io.github.caichangqing1120.xxljob",
   "name": "XXL-JOB",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "caichangqing1120",
   "description": "XXL-JOB Admin workbench for verified 2.3.x and 3.4.x APIs",
   "icon": "assets/plugin.svg",
@@ -38,6 +38,84 @@
       "id": "io.github.caichangqing1120.xxljob.workbench",
       "label": "XXL-JOB 工作台",
       "icon": "assets/plugin.svg"
+    },
+    {
+      "type": "mcp",
+      "id": "io.github.caichangqing1120.xxljob.mcp",
+      "description": "Lifecycle-bound scheduling tools; existing confirmation and read-only checks remain mandatory.",
+      "external_tools": true,
+      "ai_tools": true,
+      "toolsets": [
+        {
+          "id": "observe",
+          "title": "Jobs and logs",
+          "description": "Read service state and authorized resources."
+        },
+        {
+          "id": "scheduling",
+          "title": "Scheduling controls",
+          "description": "Confirmed start and stop actions."
+        },
+        {
+          "id": "admin",
+          "title": "Execution and administration",
+          "description": "Full-access execution, task configuration, deletion and executor administration."
+        }
+      ],
+      "tools": {
+        "xxljob_info": {
+          "toolset": "observe",
+          "access": "read"
+        },
+        "xxljob_groups": {
+          "toolset": "observe",
+          "access": "read"
+        },
+        "xxljob_jobs": {
+          "toolset": "observe",
+          "access": "read"
+        },
+        "xxljob_logs": {
+          "toolset": "observe",
+          "access": "read"
+        },
+        "xxljob_log_content": {
+          "toolset": "observe",
+          "access": "read"
+        },
+        "xxljob_jobs_by_group": {
+          "toolset": "observe",
+          "access": "read"
+        },
+        "xxljob_start": {
+          "toolset": "scheduling",
+          "access": "write"
+        },
+        "xxljob_stop": {
+          "toolset": "scheduling",
+          "access": "write"
+        },
+        "xxljob_trigger": {
+          "toolset": "admin",
+          "access": "full"
+        },
+        "xxljob_save_job": {
+          "toolset": "admin",
+          "access": "full"
+        },
+        "xxljob_remove_job": {
+          "toolset": "admin",
+          "access": "full"
+        },
+        "xxljob_save_group": {
+          "toolset": "admin",
+          "access": "full"
+        },
+        "xxljob_remove_group": {
+          "toolset": "admin",
+          "access": "full"
+        }
+      }
     }
   ]
 }

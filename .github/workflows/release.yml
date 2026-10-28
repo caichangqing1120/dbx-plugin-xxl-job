@@ -1,8 +1,12 @@
 name: Build DBX review candidates
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing immutable source tag to build explicitly
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -10,8 +14,12 @@ permissions:
 jobs:
   candidates:
     runs-on: macos-15
+    env:
+      RELEASE_TAG: ${{ inputs.tag }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -20,7 +28,7 @@ jobs:
         with:
           go-version-file: backend/go.mod
       - name: Verify release tag
-        run: test "${GITHUB_REF_NAME}" = "v$(node -p 'require("./manifest.json").version')"
+        run: test "${RELEASE_TAG}" = "v$(node -p 'require("./manifest.json").version')"
       - run: npm ci --ignore-scripts
       - run: npm test
       - run: go -C backend test -race ./...
@@ -36,4 +44,4 @@ jobs:
       - name: Upload unsigned candidates
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${GITHUB_REF_NAME}" dist/*.dbxp dist/*.artifact.json dist/SHA256SUMS-*.txt dist/release-candidates.json
+        run: gh release upload "${RELEASE_TAG}" dist/*.dbxp dist/*.artifact.json dist/SHA256SUMS-*.txt dist/release-candidates.json
