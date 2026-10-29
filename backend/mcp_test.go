@@ -111,7 +111,7 @@ func TestMCPDiscoveryManifestParityAndNoEffects(t *testing.T) {
 			}
 		}
 	}
-	if found != 1 || manifest.Version != "0.2.1" || version != "0.2.1" {
+	if found != 1 || manifest.Version != "0.2.2" || version != "0.2.2" {
 		t.Fatal("manifest/initialize version or contribution mismatch")
 	}
 	if len(p.sessions) != 0 {

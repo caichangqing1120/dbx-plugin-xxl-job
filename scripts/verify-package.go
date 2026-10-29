@@ -90,7 +90,7 @@ func verify(name string, doHandshake bool) {
 		Entrypoints struct{ Backend struct{ Executable string } }
 	}
 	must(json.Unmarshal(files["manifest.json"], &manifest))
-	require(manifest.ID == "io.github.caichangqing1120.xxljob" && manifest.Version == "0.2.1", "plugin identity mismatch")
+	require(manifest.ID == "io.github.caichangqing1120.xxljob" && manifest.Version == "0.2.2", "plugin identity mismatch")
 	exe := manifest.Entrypoints.Backend.Executable
 	require(strings.HasPrefix(exe, "bin/"+metadata.Target+"/"), "target and executable path mismatch")
 	require(len(files) == 12, "unexpected package entries")
@@ -156,6 +156,6 @@ func handshake(binary []byte) {
 		}
 	}
 	must(json.Unmarshal(bytes.TrimSpace(output), &reply))
-	require(reply.Result.ProtocolVersion == 1 && reply.Result.Plugin.ID == "io.github.caichangqing1120.xxljob" && reply.Result.Plugin.Version == "0.2.1", "package handshake mismatch")
+	require(reply.Result.ProtocolVersion == 1 && reply.Result.Plugin.ID == "io.github.caichangqing1120.xxljob" && reply.Result.Plugin.Version == "0.2.2", "package handshake mismatch")
 	fmt.Println("PASS packaged binary: plugin/initialize identity, version and protocol 1")
 }

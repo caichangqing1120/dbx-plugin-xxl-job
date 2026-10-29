@@ -1,47 +1,83 @@
-name: Build DBX review candidates
+name: Release CI-provenanced candidates
 
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing immutable source tag to build explicitly
+        description: Immutable source tag; dispatch this workflow on the same tag
         required: true
         type: string
 
 permissions:
   contents: write
 
+concurrency:
+  group: release-ci-${{ inputs.tag }}
+  cancel-in-progress: false
+
 jobs:
-  candidates:
-    runs-on: macos-15
-    env:
-      RELEASE_TAG: ${{ inputs.tag }}
+  preflight:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
       - uses: actions/setup-go@v5
         with:
-          go-version-file: backend/go.mod
-      - name: Verify release tag
-        run: test "${RELEASE_TAG}" = "v$(node -p 'require("./manifest.json").version')"
+          go-version: '1.26.3'
+          cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Require tag-dispatched clean source
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          python3 - <<'PYCODE'
+          import json, os, pathlib, subprocess
+          tag = os.environ['RELEASE_TAG']
+          assert tag == 'v' + json.loads(pathlib.Path('manifest.json').read_text())['version']
+          assert tag == os.environ['GITHUB_REF_NAME']
+          head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          assert head == os.environ['GITHUB_SHA']
+          assert head == subprocess.check_output(['git', 'rev-parse', tag + '^{commit}'], text=True).strip()
+          assert not subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=all'])
+          PYCODE
       - run: npm ci --ignore-scripts
       - run: npm test
-      - run: go -C backend test -race ./...
-      - run: go -C backend vet ./...
-      - run: npm install --global @dbx-app/plugin-cli@0.1.9
-      - run: npm run package:all
-      - name: Verify native package protocol
+      - name: Backend tests and guards
+        run: go -C backend test -count=1 -race ./... && go -C backend vet ./...
+      - name: CI provenance regression
+        run: python3 -m unittest discover -s tests -p test_ci_provenance.py
+      - name: Validate current Store consumer contract
         run: |
-          arch=$(node -p 'process.arch === "arm64" ? "arm64" : "x64"')
-          id=$(node -p 'require("./manifest.json").id')
-          version=$(node -p 'require("./manifest.json").version')
-          go run scripts/verify-package.go "dist/${id}-${version}-darwin-${arch}.dbxp" --handshake
-      - name: Upload unsigned candidates
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${RELEASE_TAG}" dist/*.dbxp dist/*.artifact.json dist/SHA256SUMS-*.txt dist/release-candidates.json
+          git clone --quiet https://github.com/t8y2/dbx-store.git "$RUNNER_TEMP/dbx-store"
+          git -C "$RUNNER_TEMP/dbx-store" checkout --quiet 5b8ab0045086a9838c35b730c5a37df02632f870
+          DBX_STORE_ROOT="$RUNNER_TEMP/dbx-store" npm run test:release
+
+  candidates:
+    needs: preflight
+    uses: t8y2/dbx/.github/workflows/plugin-release-reusable.yml@417c1bfc28ea8669dfbc2e1525f54e3b68285b1c
+    with:
+      release-tag: ${{ inputs.tag }}
+      node-version: '22'
+      go-version: '1.26.3'
+      rust-toolchain: ''
+      install-plugin-cli: false
+      package-command: |
+        npm ci --ignore-scripts
+        npm run build
+        git diff --exit-code
+        RELEASE_TAG="$GITHUB_REF_NAME" python3 scripts/package-ci.py
+      package-path: dist/*.dbxp
+      metadata-path: |
+        dist/*.artifact.json
+        dist/*.provenance.json
+      build-matrix: >-
+        {"include":[{"runner":"ubuntu-24.04","target":"linux-x64"},{"runner":"ubuntu-24.04-arm","target":"linux-arm64"},{"runner":"ubuntu-24.04","target":"windows-x64"},{"runner":"macos-15-intel","target":"darwin-x64"},{"runner":"macos-15","target":"darwin-arm64"},{"runner":"ubuntu-24.04-arm","target":"windows-arm64"}]}

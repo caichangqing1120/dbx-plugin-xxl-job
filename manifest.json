@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "id": "io.github.caichangqing1120.xxljob",
   "name": "XXL-JOB",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "publisher": "caichangqing1120",
   "description": "XXL-JOB Admin workbench for verified 2.3.x and 3.4.x APIs",
   "icon": "assets/plugin.svg",

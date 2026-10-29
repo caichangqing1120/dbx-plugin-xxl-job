@@ -78,3 +78,23 @@ Pre-flight: Task 1 registry names, schemas and access are the sole input to Task
 - [x] Import the real generated release without conversion using actual Store sync/validator, validate its schema and checksum/size parity; record patch-specific repo-relative notes and validation. No remote writes from this execution worker.
 
 Review focus: flat author-vs-Store candidate confusion, unsupported metadata fields, altered MCP contributions, missing architecture assets, and stale initialize/package versions. The regression exercises the real importer/validator rather than reproducing the output builder's expectations. No execution helpers or legacy ledgers are used.
+
+## Maintainer Review Response 0.2.2
+
+**Spec:** `spec.md`, Maintainer Review Response 0.2.2 (2026-10-29). Reuse this
+canonical package and retain historical tasks/receipts. The coordinating delivery
+step owns CI helpers/workflows, complete tests, commits and remote actions; no
+execution helper or legacy ledger is used for metadata/docs edits.
+
+- [x] Confirm the canonical isolated worktree, current branch and clean starting state; read this plan and its bound Spec.
+- [x] Align active manifest/backend/npm/lock versions to 0.2.2; preserve manifest contributions and empty permissions.
+- [x] Apply the exact first-Store-update-since-0.1.1 disclosure of all 13 read/write/full tools and pin source to `tree/v0.2.2`.
+- [x] Add new 0.2.2 notes/README requirements while leaving old versioned notes, receipts, tags and assets unchanged.
+- [x] Run focused metadata/diff invariants: active versions agree, manifest/tools/permissions and dependency graph are unchanged, Store notes/source match the release scope, and `git diff --check` passes.
+- [x] Coordinating delivery step runs full tests/builds after updating version-aware checks.
+- [ ] Build all six targets in clean CI through the pinned official reusable workflow/helper, requiring full tag-matching VCS stamps and `vcs.modified=false`.
+- [ ] Verify downloaded bytes/provenance and actual Store import/validation before separately authorized publication and Store resubmission.
+
+CI/provenance verification, publication and Store review/signing remain pending
+until separately evidenced. Preserve all 13 tool declarations, lifecycle and
+confirmation/read-only guards, UI/API behavior and user grants.

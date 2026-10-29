@@ -12,7 +12,8 @@ assert(process.env.DBX_STORE_ROOT, 'Set DBX_STORE_ROOT to a dbx-store checkout t
 const store = resolve(process.env.DBX_STORE_ROOT);
 const manifest = JSON.parse(readFileSync(join(root, 'manifest.json'), 'utf8'));
 const listing = JSON.parse(readFileSync(join(root, '.dbx-store.json'), 'utf8'));
-const repository = new URL(listing.source).pathname.slice(1);
+const repository = new URL(listing.source).pathname.split('/').filter(Boolean).slice(0, 2).join('/');
+const repositoryUrl = `https://github.com/${repository}`;
 const tag = `v${manifest.version}`;
 const targets = ['darwin-arm64', 'darwin-x64', 'windows-arm64', 'windows-x64', 'linux-arm64', 'linux-x64'];
 
@@ -103,7 +104,7 @@ test('package:all emits six artifacts importable by the real Store synchronizer'
     const bytes = Buffer.from(`public fixture package: ${artifact.target}`);
     assert.equal(artifact.sha256, createHash('sha256').update(bytes).digest('hex'));
     assert.equal(artifact.size, bytes.length);
-    assert.equal(artifact.url, `${listing.source}/releases/download/${tag}/${manifest.id}-${manifest.version}-${artifact.target}.dbxp`);
+    assert.equal(artifact.url, `${repositoryUrl}/releases/download/${tag}/${manifest.id}-${manifest.version}-${artifact.target}.dbxp`);
   }
 });
 
@@ -113,7 +114,7 @@ test('active listing is accepted as Store metadata independently of the release 
     artifacts: [{ target: 'linux-x64', url: 'fixture.dbxp', sha256: 'a'.repeat(64), size: 128 }],
   });
   assert.equal(candidate.name, listing.name);
-  assert.equal(candidate.targets[0].url, `${listing.source}/releases/download/${tag}/fixture.dbxp`);
+  assert.equal(candidate.targets[0].url, `${repositoryUrl}/releases/download/${tag}/fixture.dbxp`);
 });
 
 test('actual built release imports without reshaping and matches all package bytes', {

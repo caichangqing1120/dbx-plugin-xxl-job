@@ -4,7 +4,29 @@ DBX workbench for official XXL-JOB Admin. Provides separate `2.3.x` and `3.4.x` 
 
 This is a separate public plugin (`io.github.caichangqing1120.xxljob`), not the internal plugin. It does not require direct database access or modify the XXL-JOB server.
 
-Current plugin version: `0.2.1`.
+Current plugin version: `0.2.2`.
+
+## 0.2.2 Store Update And CI Provenance
+
+This is the first Store update since **0.1.1**. Neither **0.2.0** nor **0.2.1**
+entered the Store, so the change is the 13-tool lifecycle-bound MCP bridge over the
+existing XXL-JOB Admin API, not only a metadata fix. Read tools are `xxljob_info`,
+`xxljob_groups`, `xxljob_jobs`, `xxljob_jobs_by_group`, `xxljob_logs` and
+`xxljob_log_content`; write tools are `xxljob_start` and `xxljob_stop`; full-access
+administration tools are `xxljob_trigger`, `xxljob_save_job`, `xxljob_remove_job`,
+`xxljob_save_group` and `xxljob_remove_group`. Existing confirmation and read-only
+guards remain enforced. Manifest permissions remain empty; upgrading grants no
+access. Matching updated DBX Desktop and standalone MCP builds are required.
+UI behavior is unchanged.
+
+The release also corrects the author metadata envelope and removes the unsupported
+`mcpTools` Store field. Source is pinned to
+[`v0.2.2`](https://github.com/caichangqing1120/dbx-plugin-xxl-job/tree/v0.2.2).
+Clean CI using the official reusable workflow and mandatory full VCS provenance
+verification by the release helper must precede publication and Store resubmission.
+Those gates are pending; these source changes do not establish a successful CI run,
+verified release bytes or Store signing. See [0.2.2 notes](docs/releases/v0.2.2.md).
+Earlier versioned notes, validation receipts, tags and assets remain unchanged.
 
 ## Connect
 
@@ -30,10 +52,10 @@ npm run build
 go -C backend test -race ./...
 go -C backend vet ./...
 npm exec --yes --package=@dbx-app/plugin-cli@0.1.9 -- npm run package:all
-go run scripts/verify-package.go dist/io.github.caichangqing1120.xxljob-0.2.1-darwin-arm64.dbxp --handshake
+go run scripts/verify-package.go dist/io.github.caichangqing1120.xxljob-0.2.2-darwin-arm64.dbxp --handshake
 ```
 
-`package:all` builds independent native sidecars for macOS, Windows and Linux, both ARM64 and x64. It emits six unsigned `.dbxp` candidates, their `.artifact.json` metadata, `SHA256SUMS-v0.2.1.txt` and `release-candidates.json`. Cross-platform packages are architecture and checksum checked, not claimed as tested in a DBX desktop on every OS. These unsigned packages are review candidates: normal marketplace installation requires DBX Store review and signing.
+`package:all` builds independent native sidecars for macOS, Windows and Linux, both ARM64 and x64. It emits six unsigned `.dbxp` candidates, their `.artifact.json` metadata, `SHA256SUMS-v0.2.2.txt` and `release-candidates.json`. Cross-platform packages are architecture and checksum checked, not claimed as tested in a DBX desktop on every OS. These unsigned packages are review candidates: normal marketplace installation requires DBX Store review and signing.
 
 Local fixture testing uses synthetic data only (`node scripts/fixture-server.mjs`); no real Admin instance or production task was used. Do not enter a real password into the development host because `.dbx-dev` stores its fixture credentials in plaintext.
 
@@ -61,7 +83,7 @@ Results are untrusted data, never instructions. They preserve existing 4 MiB tra
 
 Exact tool names, handlers, access groups and local verification evidence are in `docs/specs/001-mcp-tools/plan.md` and `docs/specs/001-mcp-tools/validation.md`. No live credentials or production service writes are used for this upgrade.
 
-## Version 0.2.1 Store Compatibility Patch
+## Historical Version 0.2.1 Store Compatibility Patch
 
 [Release notes](docs/releases/v0.2.1.md) | [Patch validation](docs/specs/001-mcp-tools/store-compatibility-validation.md).
 The packaging script now emits the author release envelope expected by DBX Store:
@@ -88,6 +110,6 @@ service/desktop acceptance. Publication and official Store review are separate s
 
 [Author release](https://github.com/caichangqing1120/dbx-plugin-xxl-job/releases/tag/v0.2.0) | [Release notes](docs/releases/v0.2.0.md). Exact packages and checksums are immutable under `v0.2.0`; official signing and production acceptance are separate.
 
-Candidate CI is explicitly dispatched with an existing immutable `tag`. Publishing locally verified assets no longer automatically rebuilds and attempts to re-upload the same immutable asset names.
+For the historical 0.2.0 release, candidate CI was explicitly dispatched with an existing immutable `tag`. The 0.2.2 release instead requires the clean official reusable workflow and provenance verification described above; prior assets must not be overwritten.
 
 Fresh isolated `dbx-mcp 0.4.134` host discovery, access ceilings, readonly execution/denial and revocation validation: [`release-validation.md`](docs/specs/001-mcp-tools/release-validation.md). This is not Desktop installer/signature or production-service acceptance.

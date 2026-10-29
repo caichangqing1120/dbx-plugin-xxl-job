@@ -64,6 +64,12 @@ if (requestedTarget === 'all') {
 
   const listing = JSON.parse(readFileSync('.dbx-store.json', 'utf8'));
   const tag = `v${manifest.version}`;
+  const sourceUrl = new URL(listing.source);
+  const repository = sourceUrl.pathname.split('/').filter(Boolean).slice(0, 2).join('/');
+  if (sourceUrl.protocol !== 'https:' || sourceUrl.hostname !== 'github.com' || repository.split('/').length !== 2) {
+    throw new Error('Store source must reference a public GitHub repository or tag');
+  }
+  const repositoryUrl = `https://github.com/${repository}`;
   const candidate = {
     plugin: {
       id: manifest.id,
@@ -80,7 +86,7 @@ if (requestedTarget === 'all') {
       if (metadata.target !== target || metadata.sha256 !== sha256 || metadata.size !== readFileSync(artifact).length) {
         throw new Error(`Candidate metadata mismatch: ${target}`);
       }
-      return { target, url: `${listing.source}/releases/download/${tag}/${basename(artifact)}`, sha256, size: metadata.size };
+      return { target, url: `${repositoryUrl}/releases/download/${tag}/${basename(artifact)}`, sha256, size: metadata.size };
     }),
   };
   writeFileSync(join('dist', 'release-candidates.json'), `${JSON.stringify(candidate, null, 2)}\n`);
