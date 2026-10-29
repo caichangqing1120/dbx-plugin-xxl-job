@@ -111,7 +111,7 @@ func TestMCPDiscoveryManifestParityAndNoEffects(t *testing.T) {
 			}
 		}
 	}
-	if found != 1 || manifest.Version != "0.2.0" || version != "0.2.0" {
+	if found != 1 || manifest.Version != "0.2.1" || version != "0.2.1" {
 		t.Fatal("manifest/initialize version or contribution mismatch")
 	}
 	if len(p.sessions) != 0 {
@@ -494,18 +494,6 @@ func TestMCPCacheIsBoundedAndConcurrentCallsAreIsolated(t *testing.T) {
 	}
 }
 
-func TestMCPActiveStoreListingAdvertisesTools(t *testing.T) {
-	b, e := os.ReadFile("../.dbx-store.json")
-	if e != nil {
-		t.Fatal(e)
-	}
-	var listing struct {
-		MCPTools bool `json:"mcpTools"`
-	}
-	if json.Unmarshal(b, &listing) != nil || !listing.MCPTools {
-		t.Fatal("active store metadata omits MCP tools badge")
-	}
-}
 func TestMCPNormalUserCannotEscalateExecutorOrJobPermissions(t *testing.T) {
 	writes := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

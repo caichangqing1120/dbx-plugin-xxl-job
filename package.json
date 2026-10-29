@@ -1,12 +1,13 @@
 {
   "name": "xxl-job-dbx-plugin",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": false,
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vue-tsc --noEmit && vite build",
     "test": "vitest run",
+    "test:release": "node --test scripts/test-release-contract.mjs",
     "package": "npm run build && node scripts/package.mjs",
     "package:all": "npm run build && node scripts/package.mjs all"
   },

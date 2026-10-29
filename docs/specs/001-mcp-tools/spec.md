@@ -26,3 +26,10 @@ Baseline tests run before edits. New tests are observed failing before bridge im
 ## Delivery Authorization (2026-10-28)
 
 The user explicitly requests local verification, publication of the new version, and source-code push. This authorizes immutable v0.2.0 author releases in each repository's existing public/private channel, a tag-only source prerequisite, and then fast-forward updates to the existing source branches. It does not authorize production service writes, changing the user's real MCP grants, official Store signing, unrelated branch merges or overwriting prior assets.
+
+
+## Store Compatibility Patch 0.2.1 (2026-10-29)
+
+The user authorizes correcting public author release metadata and publishing a new immutable `0.2.1` patch; do not modify historical `0.2.0` assets or receipts. Preserve the plugin ID/publisher, all MCP declarations/access levels, APIs and UI behavior. Bump only active manifest, backend initialize and package/lock versions. Store listing metadata must contain only fields allowed by `dbx-store` sync; MCP support stays declared in the packaged manifest, not an unsupported `.dbx-store.json` badge.
+
+The active `package:all` generator must emit `release-candidates.json` as `{plugin: {id, publisher, version, name, description, permissions}, artifacts: [{target, url, sha256, size}]}`. The Store synchronizer consumes this author release envelope and creates its separate flat catalog candidate; these are different contracts. Keep all six platform artifacts, per-artifact metadata and SHA256 checksum file. Import unmodified generated output through the actual Store synchronizer, then validate its catalog candidate with the actual Store validator/schema. Local fixtures only; no services, credentials, installation or grant changes.

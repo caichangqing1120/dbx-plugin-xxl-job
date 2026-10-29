@@ -64,23 +64,16 @@ if (requestedTarget === 'all') {
 
   const listing = JSON.parse(readFileSync('.dbx-store.json', 'utf8'));
   const tag = `v${manifest.version}`;
-  const source = `${listing.source}/tree/${tag}`;
   const candidate = {
-    schemaVersion: 1,
-    id: manifest.id,
-    publisher: manifest.publisher,
-    version: manifest.version,
-    name: listing.name,
-    description: listing.description,
-    icon: `https://raw.githubusercontent.com${new URL(listing.source).pathname}/${tag}/${listing.icon}`,
-    tags: listing.tags,
-    permissions: listing.permissions,
-    mcpTools: listing.mcpTools,
-    source,
-    homepage: listing.homepage,
-    license: listing.license,
-    releaseNotes: listing.releaseNotes,
-    targets: targets.map((target, index) => {
+    plugin: {
+      id: manifest.id,
+      publisher: manifest.publisher,
+      version: manifest.version,
+      name: manifest.name,
+      description: manifest.description,
+      permissions: manifest.permissions ?? [],
+    },
+    artifacts: targets.map((target, index) => {
       const artifact = artifactPaths[index];
       const metadata = JSON.parse(readFileSync(artifact.replace(/\.dbxp$/, '.artifact.json'), 'utf8'));
       const sha256 = createHash('sha256').update(readFileSync(artifact)).digest('hex');

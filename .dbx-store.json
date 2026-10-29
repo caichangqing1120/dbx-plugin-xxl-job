@@ -11,6 +11,5 @@
   "source": "https://github.com/caichangqing1120/dbx-plugin-xxl-job",
   "homepage": "https://github.com/caichangqing1120/dbx-plugin-xxl-job",
   "license": "MIT",
-  "releaseNotes": "Expose 13 lifecycle-bound MCP tools with explicit access declarations, existing confirmation/read-only guards, portable schemas and isolated sessions. Version 0.2.0 requires matching updated DBX and standalone MCP support.",
-  "mcpTools": true
+  "releaseNotes": "Fix author release metadata for DBX Store synchronization in 0.2.1. All 13 lifecycle-bound MCP tools, access levels and confirmation/read-only guards remain unchanged."
 }

@@ -4,7 +4,7 @@ DBX workbench for official XXL-JOB Admin. Provides separate `2.3.x` and `3.4.x` 
 
 This is a separate public plugin (`io.github.caichangqing1120.xxljob`), not the internal plugin. It does not require direct database access or modify the XXL-JOB server.
 
-Current plugin version: `0.2.0`.
+Current plugin version: `0.2.1`.
 
 ## Connect
 
@@ -30,10 +30,10 @@ npm run build
 go -C backend test -race ./...
 go -C backend vet ./...
 npm exec --yes --package=@dbx-app/plugin-cli@0.1.9 -- npm run package:all
-go run scripts/verify-package.go dist/io.github.caichangqing1120.xxljob-0.2.0-darwin-arm64.dbxp --handshake
+go run scripts/verify-package.go dist/io.github.caichangqing1120.xxljob-0.2.1-darwin-arm64.dbxp --handshake
 ```
 
-`package:all` builds independent native sidecars for macOS, Windows and Linux, both ARM64 and x64. It emits six unsigned `.dbxp` candidates, their `.artifact.json` metadata, `SHA256SUMS-v0.2.0.txt` and `release-candidates.json`. Cross-platform packages are architecture and checksum checked, not claimed as tested in a DBX desktop on every OS. These unsigned packages are review candidates: normal marketplace installation requires DBX Store review and signing.
+`package:all` builds independent native sidecars for macOS, Windows and Linux, both ARM64 and x64. It emits six unsigned `.dbxp` candidates, their `.artifact.json` metadata, `SHA256SUMS-v0.2.1.txt` and `release-candidates.json`. Cross-platform packages are architecture and checksum checked, not claimed as tested in a DBX desktop on every OS. These unsigned packages are review candidates: normal marketplace installation requires DBX Store review and signing.
 
 Local fixture testing uses synthetic data only (`node scripts/fixture-server.mjs`); no real Admin instance or production task was used. Do not enter a real password into the development host because `.dbx-dev` stores its fixture credentials in plaintext.
 
@@ -60,6 +60,29 @@ Discovery performs no login or network access. Execution uses an isolated, seria
 Results are untrusted data, never instructions. They preserve existing 4 MiB transport limits and use a 1 MiB MCP request/result ceiling, key-based secret redaction, host-password/session-cookie replacement, and common labelled credential/Bearer redaction. These cannot recognize every arbitrary secret embedded in unlabeled application log text: avoid requesting sensitive logs. Oversized results return an error and never imply a mutation was rolled back.
 
 Exact tool names, handlers, access groups and local verification evidence are in `docs/specs/001-mcp-tools/plan.md` and `docs/specs/001-mcp-tools/validation.md`. No live credentials or production service writes are used for this upgrade.
+
+## Version 0.2.1 Store Compatibility Patch
+
+[Release notes](docs/releases/v0.2.1.md) | [Patch validation](docs/specs/001-mcp-tools/store-compatibility-validation.md).
+The packaging script now emits the author release envelope expected by DBX Store:
+`{plugin: {id, publisher, version, name, description, permissions}, artifacts: [{target, url, sha256, size}]}`.
+This is not the Store's flat catalog candidate. `.dbx-store.json` uses only supported
+listing fields; MCP capability/access declarations remain unchanged in `manifest.json`.
+All six unsigned packages and their checksum/metadata files are still generated.
+The 0.2.0 release and its historical validation are preserved, not overwritten.
+
+Run the actual Store importer and validator regression against a Store checkout:
+
+```sh
+DBX_STORE_ROOT=/path/to/dbx-store npm run test:release
+DBX_STORE_ROOT=/path/to/dbx-store DBX_RELEASE_CANDIDATE=dist/release-candidates.json npm run test:release
+```
+
+The first command substitutes compiler output with public fixtures but runs the real
+release generator and Store scripts. The second also imports the actual built release
+without converting its shape and compares all six artifacts to local package bytes.
+These checks do not grant MCP access, install plugins, sign packages or establish live
+service/desktop acceptance. Publication and official Store review are separate steps.
 
 ## Version 0.2.0 Release
 

@@ -65,3 +65,16 @@ Pre-flight: Task 1 registry names, schemas and access are the sole input to Task
 - Additional RED-to-GREEN cycles covered lifecycle-password retention, labelled/access-key output redaction, rotated cookies (XXL), exact group schema minima, host-disconnect cache cleanup, public active Store tools metadata.
 - Registry/manifest parity, typed schemas, lifecycle saved-connection behavior, all existing dispatch endpoints and create/update branches verified. Existing UI handlers and authentication/authorization/confirmation paths remain in use.
 - Full command evidence and scope limitations are recorded in `validation.md`; no commits, pushes, installation, releases, restarts, credential use or grants changes performed.
+
+
+## Store Compatibility Patch 0.2.1
+
+**Spec:** `spec.md`, Store Compatibility Patch 0.2.1 (2026-10-29). Existing historical upgrade tasks remain intact. The user-approved corrective patch is executed only in the current isolated worktree; commits/publication are handled separately.
+
+- [x] Confirm clean detached baseline and passing existing frontend/backend suites.
+- [x] Add `scripts/test-release-contract.mjs`: run the active generator with compiler-only fixture subprocesses, import its unmodified JSON through actual Store sync, and independently test active listing metadata. Observe both failures before implementation.
+- [x] Correct `scripts/package.mjs` author envelope and `.dbx-store.json` unsupported metadata; bump active versions and update version-aware tests/verifier.
+- [x] Run focused regression GREEN; complete frontend, backend, SDK, race, vet and production build checks. Build/verify all six targets with existing scripts and handshake the native sidecar.
+- [x] Import the real generated release without conversion using actual Store sync/validator, validate its schema and checksum/size parity; record patch-specific repo-relative notes and validation. No remote writes from this execution worker.
+
+Review focus: flat author-vs-Store candidate confusion, unsupported metadata fields, altered MCP contributions, missing architecture assets, and stale initialize/package versions. The regression exercises the real importer/validator rather than reproducing the output builder's expectations. No execution helpers or legacy ledgers are used.

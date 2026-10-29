@@ -15,7 +15,7 @@ import (
 )
 
 const pluginID = "io.github.caichangqing1120.xxljob"
-const version = "0.2.0"
+const version = "0.2.1"
 
 type plugin struct {
 	mcpMu       sync.Mutex
