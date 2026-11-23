@@ -7,3 +7,4 @@ output/
 backend/bin/
 .DS_Store
 .dbx-dev/
+.workbuddy/

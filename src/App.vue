@@ -133,7 +133,7 @@ async function readLog() {
   if (logTimer) clearTimeout(logTimer); logTimer = undefined;
   const token = ++logRequest, current = epoch; state.busy = true; state.error = '';
   try {
-    const form = info.value?.adminVersion === '3.4'
+    const form = (info.value?.adminVersion === '3.4' || info.value?.adminVersion === '3.0')
       ? { logId: state.row.id, fromLineNum: state.next }
       : { executorAddress: state.row.executorAddress, triggerTime: triggerMillis(state.row.triggerTime), logId: state.row.id, fromLineNum: state.next };
     const chunk = await invoke<LogChunk>(connectionId.value, 'xxljob/logContent', { form });
@@ -160,7 +160,7 @@ onBeforeUnmount(() => { ++epoch; unsubscribe?.(); closeLog(); document.removeEve
 
 <template>
   <div class="shell">
-    <aside class="sidebar"><div class="brand"><Workflow :size="26" /><div><strong>XXL-JOB</strong><small>Admin {{ info?.adminVersion || '2.3 / 3.4' }}.x</small></div></div>
+    <aside class="sidebar"><div class="brand"><Workflow :size="26" /><div><strong>XXL-JOB</strong><small>Admin {{ info?.adminVersion || '2.3 / 3.0 / 3.4' }}.x</small></div></div>
       <nav aria-label="主导航"><button v-for="item in visibleNavigation" :key="item.key" :class="{ active: view === item.key }" :disabled="working || !!jobEditor || !!groupEditor || optionsBusy" :title="item.label" @click="changeView(item.key)"><component :is="item.icon" :size="19" /><span>{{ item.label }}</span></button></nav>
       <div class="sidebar-bottom"><small>PRIVATE WORKBENCH</small><span>v0.1.1</span></div>
     </aside>

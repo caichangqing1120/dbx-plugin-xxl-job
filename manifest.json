@@ -4,7 +4,7 @@
   "name": "XXL-JOB",
   "version": "0.2.2",
   "publisher": "caichangqing1120",
-  "description": "XXL-JOB Admin workbench for verified 2.3.x and 3.4.x APIs",
+  "description": "XXL-JOB Admin workbench for verified 2.3.x, 3.0.x and 3.4.x APIs",
   "icon": "assets/plugin.svg",
   "engines": { "dbx": ">=0.6.14", "host_api": "1" },
   "entrypoints": {
@@ -24,9 +24,9 @@
         { "key": "port", "label": "端口", "type": "number", "binding": "port", "required": true, "default": 8080 },
         { "key": "username", "label": "用户名", "type": "text", "binding": "username", "required": true },
         { "key": "password", "label": "密码", "type": "password", "binding": "password", "required": true },
-        { "key": "admin_version", "label": "Admin 版本", "type": "select", "binding": "config", "default": "3.4", "options": [{ "label": "3.4.x（默认路径 /）", "value": "3.4" }, { "label": "2.3.x（默认路径 /xxl-job-admin）", "value": "2.3" }] },
+        { "key": "admin_version", "label": "Admin 版本", "type": "select", "binding": "config", "default": "3.4", "options": [{ "label": "3.4.x（默认路径 /）", "value": "3.4" }, { "label": "3.0.x（默认路径 /xxl-job-admin）", "value": "3.0" }, { "label": "2.3.x（默认路径 /xxl-job-admin）", "value": "2.3" }] },
         { "key": "scheme", "label": "协议", "type": "select", "binding": "config", "default": "http", "options": [{ "label": "HTTP（内部网络）", "value": "http" }, { "label": "HTTPS", "value": "https" }] },
-        { "key": "context_path", "label": "应用路径（2.3.x 请改为 /xxl-job-admin）", "type": "text", "binding": "config", "default": "/" },
+        { "key": "context_path", "label": "应用路径（2.3.x / 3.0.x 默认 /xxl-job-admin）", "type": "text", "binding": "config", "default": "/" },
         { "key": "environment", "label": "环境标识", "type": "text", "binding": "config" },
         { "key": "read_only", "label": "只读模式", "type": "boolean", "default": false, "binding": "config" }
       ],

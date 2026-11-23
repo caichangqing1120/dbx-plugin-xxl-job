@@ -64,7 +64,7 @@ func mcpSchema(d mcpDefinition) map[string]any {
 			schema["enum"] = values
 		}
 		if key == "executorAddress" || key == "triggerTime" {
-			schema["description"] = "Log identity from a prior logs result; required by legacy Admin, ignored by public Admin 3.4."
+			schema["description"] = "Log identity from a prior logs result; required by Admin 2.3.x only, ignored by Admin 3.0.x and 3.4.x."
 		}
 		properties[key] = schema
 	}

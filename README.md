@@ -1,6 +1,6 @@
 # XXL-JOB for DBX
 
-DBX workbench for official XXL-JOB Admin. Provides separate `2.3.x` and `3.4.x` API profiles; choose the Admin version when creating a connection. These profiles were checked against official `2.3.0` and `3.4.2` source respectively. The latest official release checked for this project is `3.4.2` (June 19, 2026). Other releases and customized distributions are not assumed compatible without testing.
+DBX workbench for official XXL-JOB Admin. Provides separate `2.3.x`, `3.0.x` and `3.4.x` API profiles; choose the Admin version when creating a connection. These profiles were checked against official `2.3.0`, `3.0.0` and `3.4.2` source respectively. The latest official release checked for this project is `3.4.2` (June 19, 2026). Other releases and customized distributions are not assumed compatible without testing.
 
 This is a separate public plugin (`io.github.caichangqing1120.xxljob`), not the internal plugin. It does not require direct database access or modify the XXL-JOB server.
 
@@ -30,7 +30,7 @@ Earlier versioned notes, validation receipts, tags and assets remain unchanged.
 
 ## Connect
 
-Requires DBX `0.6.14` or newer, Host API `1`. Enter the Admin IP/domain, port, username and password. New connections select `3.4.x` and `/` by default, matching the official 3.4.2 configuration. For stock `2.3.x`, select that version and change the application path to `/xxl-job-admin`. If the Admin is deployed at a custom path, enter that path instead. HTTPS and DBX SSH/proxy/HTTP tunnels are supported. HTTP transmits the login password in clear text: use it only on a trusted private network.
+Requires DBX `0.6.14` or newer, Host API `1`. Enter the Admin IP/domain, port, username and password. New connections select `3.4.x` and `/` by default, matching the official 3.4.2 configuration. For stock `2.3.x` or `3.0.x`, select that version and change the application path to `/xxl-job-admin`. If the Admin is deployed at a custom path, enter that path instead. HTTPS and DBX SSH/proxy/HTTP tunnels are supported. HTTP transmits the login password in clear text: use it only on a trusted private network.
 
 The plugin authenticates to the selected Admin version and keeps the session cookie in memory. Redirects are never followed; expired sessions require reconnecting. Existing connections without a version selector retain the legacy `2.3.x` profile. For a new connection, the default is `3.4.x`.
 
@@ -39,7 +39,7 @@ The plugin authenticates to the selected Admin version and keeps the session coo
 - Admin users can manage executor groups. Non-admin users see only their authorized groups; writes are checked again by the backend.
 - Read-only connections prevent all changes. Ambiguous write results are not retried.
 
-The version profiles differ: `2.3.x` uses `/login`, legacy flat pagination and singular `id`; `3.4.x` uses `/auth/doLogin`, `Response<PageModel>` and `ids[]` for some writes. The plugin never probes a write endpoint to infer a version. An unsupported version is rejected before login. Version selection is not a guarantee for forks or untested deployments.
+The version profiles differ: `2.3.x` uses `/login`, legacy flat pagination and singular `id`; `3.0.x` keeps that wire contract but sends the now-required empty filter parameters (`appname`, `title`, `jobDesc`, `executorHandler`, `author`, `filterTime`) on the `pageList` endpoints, and reads execution logs from the log row instead of requiring `executorAddress`/`triggerTime`; `3.4.x` uses `/auth/doLogin`, `Response<PageModel>` and `ids[]` for some writes. The plugin never probes a write endpoint to infer a version. An unsupported version is rejected before login. Version selection is not a guarantee for forks or untested deployments.
 
 ## Build and verify
 

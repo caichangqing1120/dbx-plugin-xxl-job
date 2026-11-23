@@ -372,7 +372,7 @@ func buildForm(method string, input map[string]any, version ...string) (url.Valu
 	}
 	if method == "xxljob/logContent" {
 		keys := []string{"logId", "fromLineNum"}
-		if len(version) == 0 || version[0] != "3.4" {
+		if len(version) == 0 || (version[0] != "3.4" && version[0] != "3.0") {
 			keys = append(keys, "triggerTime")
 		}
 		for _, key := range keys {
@@ -380,7 +380,7 @@ func buildForm(method string, input map[string]any, version ...string) (url.Valu
 				return nil, e
 			}
 		}
-		if len(version) == 0 || version[0] != "3.4" {
+		if len(version) == 0 || (version[0] != "3.4" && version[0] != "3.0") {
 			u, e := url.Parse(form.Get("executorAddress"))
 			if e != nil || u.Hostname() == "" || u.User != nil || (u.Scheme != "http" && u.Scheme != "https") {
 				return nil, errors.New("执行器地址无效")

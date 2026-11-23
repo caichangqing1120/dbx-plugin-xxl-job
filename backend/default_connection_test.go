@@ -97,8 +97,10 @@ func TestVersionPathsAndCustomPath(t *testing.T) {
 	for _, tc := range []struct{ name, version, path, expected string }{
 		{"legacy fallback", "", "", "/xxl-job-admin/login"},
 		{"2.3 default", "2.3", "", "/xxl-job-admin/login"},
+		{"3.0 default", "3.0", "", "/xxl-job-admin/login"},
 		{"3.4 default", "3.4", "", "/auth/doLogin"},
 		{"2.3 configured", "2.3", "/xxl-job-admin", "/xxl-job-admin/login"},
+		{"3.0 configured", "3.0", "/xxl-job-admin", "/xxl-job-admin/login"},
 		{"3.4 custom", "3.4", "/custom", "/custom/auth/doLogin"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
