@@ -5,6 +5,31 @@ import (
 	"net/url"
 )
 
+// XXL-JOB 3.0.x changed the pageList filter parameters from optional to
+// @RequestParam(required = true). Omitting them makes Spring return HTTP 400.
+// 2.3.x treats the same parameters as optional, so sending empty values keeps
+// both official wire contracts valid.
+func fillLegacyPageFilters(path string, form url.Values) {
+	switch path {
+	case "/jobgroup/pageList":
+		for _, key := range []string{"appname", "title"} {
+			if _, ok := form[key]; !ok {
+				form.Set(key, "")
+			}
+		}
+	case "/jobinfo/pageList":
+		for _, key := range []string{"jobDesc", "executorHandler", "author"} {
+			if _, ok := form[key]; !ok {
+				form.Set(key, "")
+			}
+		}
+	case "/joblog/pageList":
+		if _, ok := form["filterTime"]; !ok {
+			form.Set("filterTime", "")
+		}
+	}
+}
+
 // The UI consumes one pagination shape; wire formats remain version-specific.
 func normalizeLegacyPage(page map[string]any, write bool) (any, error) {
 	total, ok1 := page["recordsTotal"].(float64)
@@ -30,7 +55,13 @@ func validCount(value float64) bool {
 }
 
 func (s *session) adaptRequest(method, path string, form url.Values) (string, url.Values, error) {
-	if s.adminVersion == "2.3" {
+	if s.adminVersion == "2.3" || s.adminVersion == "3.0" {
+		fillLegacyPageFilters(path, form)
+		if s.adminVersion == "3.0" && method == "xxljob/logContent" {
+			// 3.0.x resolves the executor from the log row; these 2.3-only fields are unused.
+			form.Del("executorAddress")
+			form.Del("triggerTime")
+		}
 		return path, form, nil
 	}
 	adapted := url.Values{}

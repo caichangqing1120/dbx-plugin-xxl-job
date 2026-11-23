@@ -65,8 +65,8 @@ func newSession(c connection, runtime runtimeEndpoint) (*session, error) {
 	if adminVersion == "" {
 		adminVersion = "2.3" // Previously saved connections predate the version selector.
 	}
-	if adminVersion != "2.3" && adminVersion != "3.4" {
-		return nil, errors.New("仅支持已核验的官方 XXL-JOB Admin 2.3.x 和 3.4.x，请在连接配置中选择版本")
+	if adminVersion != "2.3" && adminVersion != "3.0" && adminVersion != "3.4" {
+		return nil, errors.New("仅支持已核验的官方 XXL-JOB Admin 2.3.x、3.0.x 和 3.4.x，请在连接配置中选择版本")
 	}
 	address := strings.TrimSpace(c.Config.BaseURL)
 	if address == "" {
@@ -77,7 +77,7 @@ func newSession(c connection, runtime runtimeEndpoint) (*session, error) {
 		path := c.Config.ContextPath
 		if path == "" {
 			path = "/"
-			if adminVersion == "2.3" {
+			if adminVersion == "2.3" || adminVersion == "3.0" {
 				path = "/xxl-job-admin"
 			}
 		}
@@ -272,7 +272,7 @@ func (s *session) request(path string, form url.Values, write bool) (any, error)
 			if write {
 				return nil, uncertain(true, "接口返回 HTML 而非 JSON，可能为登录页")
 			}
-			return nil, errors.New("接口返回 HTML 而非 JSON，请检查应用路径和原版 2.3.0 部署")
+			return nil, errors.New("接口返回 HTML 而非 JSON，请检查应用路径和原版部署")
 		}
 		return nil, uncertain(write, "不是 JSON 对象")
 	}
@@ -302,7 +302,7 @@ func (s *session) request(path string, form url.Values, write bool) (any, error)
 		}
 		return result["content"], nil
 	}
-	if s.adminVersion == "2.3" && strings.HasSuffix(path, "/pageList") {
+	if (s.adminVersion == "2.3" || s.adminVersion == "3.0") && strings.HasSuffix(path, "/pageList") {
 		return normalizeLegacyPage(result, write)
 	}
 	return nil, uncertain(write, "响应不符合所选 XXL-JOB 版本接口契约")

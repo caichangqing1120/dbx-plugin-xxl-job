@@ -16,6 +16,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -142,6 +143,9 @@ func handshake(binary []byte) {
 	must(err)
 	defer os.RemoveAll(dir)
 	executable := dir + "/xxljob"
+	if runtime.GOOS == "windows" {
+		executable += ".exe"
+	}
 	must(os.WriteFile(executable, binary, 0o700))
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
